@@ -1,0 +1,42 @@
+<h1>Registro de Usuario</h1>
+
+<form id="registerForm">
+    <input type="text" name="first_name" placeholder="Nombre" autocomplete="off" required>
+    <input type="text" name="last_name" placeholder="Apellido" autocomplete="off" required>
+    <input type="number" name="age" placeholder="Edad" required>
+    <input type="email" name="email" placeholder="Email" autocomplete="off" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <button type="submit">Registrarse</button>
+</form>
+
+<div class="nav">
+    <a href="/login">Iniciar Sesión</a>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        console.log(data);
+        fetch('/api/users', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.json()).then(data => {
+            console.log(data); // Imprimimos el resultado en la consola.
+            if (data.status === 'success') {
+                alert('Usuario registrado correctamente');
+                window.location.href = '/login';
+            } else {
+                console.error('Error:', data.message); // Imprimimos el error en la consola.
+                alert(data.message); // Mostramos el mensaje de error en una alerta.
+            }
+        }).catch(error => {
+            console.error('Error:', error); // Imprimimos el error en la consola.
+            alert(error.message); // Mostramos un mensaje de error en una alerta.
+        });
+    });
+</script>
