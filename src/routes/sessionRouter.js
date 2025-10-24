@@ -16,9 +16,14 @@ router.post('/login', validateLogin, async (req, res) => {
 // Cerrar sesión
 router.post('/logout', async (req, res) => {
     try {
-        req.session.destroy(); // Destruimos la sesión.
-        res.clearCookie('connect.sid'); // Borramos la cookie de la sesión.
-        res.redirect('/login'); // Redirigimos al login.
+        // Destruimos la sesión.
+        req.session.destroy((err) => {
+            if (err) {
+                return res.status(500).send({status: 'error', message: 'Error al cerrar sesión'}); // Si ocurre un error, devolvemos un error.
+            }
+            res.clearCookie('connect.sid'); // Borramos la cookie de la sesión.
+            res.redirect('/login'); // Redirigimos al login.
+        });
     } catch (error) {
         res.status(500).send({status: 'error', message: error.message}); // Si ocurre un error, devolvemos un error.
     }
