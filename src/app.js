@@ -1,3 +1,7 @@
+// Configuración de dotenv.
+import dotenv from 'dotenv';
+dotenv.config();
+
 // Importamos las dependencias necesarias.
 import express from 'express';
 import mongoose from 'mongoose';
@@ -23,7 +27,7 @@ app.set('view engine', 'hbs'); // Configuración de Handlebars.
 app.set('views', './src/views'); // Directorio de las vistas.
 
 // Iniciamos la conexión con MongoDB
-const uri = 'mongodb+srv://admin:uXoqegODvTCXIigF@cluster0.gpemciv.mongodb.net/?appName=Cluster0';
+const uri = process.env.MONGO_URI;
 mongoose.connect(uri);
 
 // Middlewares incorporados de Express
