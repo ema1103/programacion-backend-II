@@ -35,4 +35,11 @@ router.get('/profile', (req, res) => {
     res.render('profile', { title: 'Perfil', user });
 });
 
+router.get('/restore-password', (req, res) => {
+    if (req.session.user) {
+        return res.redirect('/profile');
+    }
+    res.render('restore-password', { title: 'Restaurar contraseña' });
+});
+
 export default router;

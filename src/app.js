@@ -8,6 +8,8 @@ import mongoose from 'mongoose';
 import session from 'express-session'; // Para manejar las sesiones del usuario.
 import MongoStore from 'connect-mongo'; // Para manejar las sesiones en MongoDB.
 import { engine } from 'express-handlebars'; // Para manejar las vistas con Handlebars.
+import { initializePassport } from './config/passport.config.js'; // Para inicializar la autenticación.
+import passport from 'passport'; // Para manejar la autenticación.
 
 // Importamos los routers.
 import userRouter from './routes/userRouter.js';
@@ -47,6 +49,13 @@ app.use(session({
     resave: false, // No re-guardar la sesión si no hay cambios.
     saveUninitialized: false, // No guardar la sesión si no hay cambios.
 }));
+
+// Inicializamos la autenticación.
+initializePassport();
+// Middleware de Passport para inicializar la autenticación.
+app.use(passport.initialize());
+// Middleware de Passport para manejar las sesiones.
+app.use(passport.session());
 
 // Configuración de los routers.
 app.use('/', viewRouter); // Router de vistas en la ruta base

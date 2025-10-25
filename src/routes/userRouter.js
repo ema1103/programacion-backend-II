@@ -1,5 +1,6 @@
 import {Router} from 'express'; // Para crear el router.
 import userModel from '../models/userModel.js'; // Para el modelo de usuarios.
+import { createHash } from '../utils.js'; // Para crear el hash de la contraseña.
 
 const router = Router();
 
@@ -37,7 +38,13 @@ router.post('/', async (req, res) => {
     
     const {first_name, last_name, age, email, password} = req.body; // Obtenemos los datos del usuario.
     try {
-        const result = await userModel.create({first_name, last_name, age, email, password}); // Creamos el usuario en la base de datos.
+        const result = await userModel.create({
+            first_name, 
+            last_name, 
+            age, 
+            email, 
+            password: createHash(password)
+        }); // Creamos el usuario en la base de datos.
         res.send({
             status: 'success',
             payload: result
@@ -62,7 +69,7 @@ router.put('/:uid', async (req, res) => {
             name: name ?? user.name, // Si no se proporciona un nombre, usamos el nombre del usuario existente.
             age: age ?? user.age, // Si no se proporciona una edad, usamos la edad del usuario existente.
             email: email ?? user.email, // Si no se proporciona un email, usamos el email del usuario existente.
-            password: password ?? user.password // Si no se proporciona una contraseña, usamos la contraseña del usuario existente.
+            password: createHash(password) ?? user.password // Si no se proporciona una contraseña, usamos la contraseña del usuario existente.
         };
 
         const updateUser = await userModel.updateOne({_id: uid}, newUser); // Actualizamos el usuario en la base de datos.
@@ -93,6 +100,22 @@ router.delete('/:uid', async (req, res) => {
             status: 'error',
             message: error.message
         });
+    }
+});
+
+router.post('/restore-password', async (req, res) => {
+    const {email, password} = req.body; // Obtenemos el email y la nueva contraseña del usuario.
+    try {
+        const user = await userModel.findOne({email}); // Buscamos el usuario por su email.
+        if (!user) return res.status(404).send({status: 'error', message: 'User not found'}); // Si el usuario no existe, devolvemos un error.
+        const newUser = {password: createHash(password)}; // Creamos el nuevo usuario en la base de datos.
+        const updateUser = await userModel.updateOne({_id: user._id}, newUser); // Actualizamos el usuario en la base de datos.
+        res.send({
+            status: 'success',
+            payload: updateUser
+        });
+    } catch (error) {
+        res.status(500).send({status: 'error', message: error.message});
     }
 });
 
